@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="sk">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Slovensko Trip 2020</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.9/babel.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:wght@300;400;500;600;700&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: #FAF8F5; }
+    
+    .day-card {
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      cursor: pointer;
+    }
+    .day-card:hover {
+      transform: translateY(-2px);
+    }
+    .event-row {
+      animation: fadeSlide 0.35s ease forwards;
+      opacity: 0;
+      transform: translateY(8px);
+    }
+    @keyframes fadeSlide {
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .time-pill {
+      font-family: 'DM Sans', sans-serif;
+      font-variant-numeric: tabular-nums;
+    }
+    .type-badge {
+      font-family: 'DM Sans', sans-serif;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      font-size: 10px;
+      font-weight: 600;
+    }
+    .note-tag {
+      font-family: 'DM Sans', sans-serif;
+    }
+    .header-decoration {
+      width: 60px;
+      height: 3px;
+      background: #2D6A4F;
+      margin: 12px auto 0;
+      border-radius: 2px;
+    }
+    .location-text {
+      font-family: 'DM Sans', sans-serif;
+    }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+  <script type="text/babel">
+    const { useState } = React;
+
+    const tripData = [
+      {
+        date: "Štvrtok, 20. augusta",
+        color: "#2D6A4F",
+        accent: "#B7E4C7",
+        events: [
+          { time: "12:30", end: "13:30", type: "lodging", title: "Check-in: AirBnB", location: "Jesenského, Banská Bystrica", note: null },
+          { time: "11:00", end: "12:00", type: "restaurant", title: "Obed v Banskej Bystrici", location: "Dolná 175, Banská Bystrica", note: null },
+          { time: "15:00", end: "18:00", type: "tour", title: "Bojnický zámok", location: "Zámok a okolie 1, Bojnice", note: "Vstupné: 10 €" },
+          { time: "18:00", end: "19:00", type: "restaurant", title: "Večera v Bojniciach", location: "Hurbanovo námestie 10/17, Bojnice", note: null },
+          { time: "19:00", end: "19:30", type: "tour", title: "Chodník v oblakoch", location: "Kúpele, Bojnice", note: "Vstupné: 8 €" },
+        ],
+      },
+      {
+        date: "Piatok, 21. augusta",
+        color: "#1B4965",
+        accent: "#BEE9E8",
+        events: [
+          { time: "09:00", end: null, type: "lodging", title: "Check-out: AirBnB", location: "Banská Bystrica", note: null },
+          { time: "11:00", end: "18:00", type: "activity", title: "Slnečné jazerá", location: "Senec", note: "Parkovanie 3 € + vstup 3 €/osoba" },
+          { time: "13:00", end: "14:00", type: "restaurant", title: "Reštaurácia s morskými potvorami", location: "Slnečné jazerá - juh, Senec", note: null },
+          { time: "19:00", end: null, type: "lodging", title: "Check-in: AirBnB", location: "Nitra", note: null },
+        ],
+      },
+      {
+        date: "Sobota, 22. augusta",
+        color: "#7B2D26",
+        accent: "#F4C2C2",
+        events: [
+          { time: "09:00", end: "10:00", type: "tour", title: "Nádvorie Európy", location: "Nádvorie Európy 46, Komárno", note: null },
+          { time: "10:30", end: "11:30", type: "activity", title: "Múzeum vodného mlynárstva", location: "Petőfiho rad 1021/4, Kolárovo", note: null },
+          { time: "12:30", end: "13:30", type: "activity", title: "Kukuričné bludisko", location: "Vlčkovce", note: null },
+          { time: "15:00", end: "16:00", type: "tour", title: "Nitriansky hrad", location: "Námestie Jána Pavla II., Nitra", note: null },
+          { time: "16:00", end: "16:30", type: "activity", title: "Synagóga", location: "Pri synagóge 1387/3, Nitra", note: null },
+          { time: "19:00", end: "20:00", type: "restaurant", title: "Sahara čajovňa", location: "Palárikova 2046/1, Nitra", note: null },
+        ],
+      },
+      {
+        date: "Nedeľa, 23. augusta",
+        color: "#5A4E3C",
+        accent: "#E8DCC8",
+        events: [
+          { time: "09:00", end: null, type: "lodging", title: "Check-out: AirBnB", location: "Nitra", note: null },
+          { time: "10:30", end: "12:00", type: "tour", title: "Trenčiansky hrad + centrum", location: "Matúšova 75/19, Trenčín", note: null },
+          { time: "12:30", end: "13:30", type: "restaurant", title: "Remy's Bistro & Pub", location: "Stará Tržnica, Saratovská 2373, Trenčín", note: null },
+        ],
+      },
+    ];
+
+    const typeConfig = {
+      tour: { icon: "⛪", label: "Výlet" },
+      restaurant: { icon: "🍽", label: "Reštaurácia" },
+      activity: { icon: "✦", label: "Aktivita" },
+      lodging: { icon: "🏠", label: "Ubytovanie" },
+    };
+
+    function SlovakiaTrip() {
+      const [expandedDay, setExpandedDay] = useState(-1);
+
+      return (
+        <div style={{
+          minHeight: "100vh",
+          background: "#FAF8F5",
+          fontFamily: "'Crimson Pro', 'Georgia', serif",
+        }}>
+          {/* Header */}
+          <div style={{
+            textAlign: "center",
+            padding: "48px 24px 36px",
+            borderBottom: "1px solid #E8E2DA",
+          }}>
+            <p style={{
+              fontFamily: "'DM Sans', sans-serif",
+              fontSize: "11px",
+              letterSpacing: "0.2em",
+              textTransform: "uppercase",
+              color: "#999",
+              marginBottom: "8px",
+              fontWeight: 500,
+            }}>
+              20. – 23. augusta 2020
+            </p>
+            <h1 style={{
+              fontSize: "clamp(32px, 6vw, 48px)",
+              fontWeight: 300,
+              color: "#2A2A2A",
+              letterSpacing: "-0.02em",
+              lineHeight: 1.1,
+            }}>
+              Slovensko Trip 2020
+            </h1>
+            <div className="header-decoration" />
+            <p style={{
+              fontFamily: "'DM Sans', sans-serif",
+              fontSize: "13px",
+              color: "#888",
+              marginTop: "16px",
+            }}>
+              Banská Bystrica · Bojnice · Senec · Nitra · Komárno · Trenčín
+            </p>
+          </div>
+
+          {/* Days */}
+          <div style={{
+            maxWidth: "680px",
+            margin: "0 auto",
+            padding: "24px 16px 64px",
+          }}>
+            {tripData.map((day, dayIdx) => {
+              const isOpen = expandedDay === dayIdx;
+              return (
+                <div
+                  key={dayIdx}
+                  className="day-card"
+                  style={{
+                    marginBottom: "16px",
+                    borderRadius: "12px",
+                    overflow: "hidden",
+                    background: "#fff",
+                    border: isOpen ? `2px solid ${day.color}22` : "2px solid transparent",
+                    boxShadow: isOpen
+                      ? "0 8px 32px rgba(0,0,0,0.08)"
+                      : "0 1px 4px rgba(0,0,0,0.04)",
+                  }}
+                >
+                  {/* Day Header */}
+                  <div
+                    onClick={() => setExpandedDay(isOpen ? -1 : dayIdx)}
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      padding: "20px 24px",
+                      gap: "16px",
+                      userSelect: "none",
+                    }}
+                  >
+                    <div style={{
+                      width: "44px",
+                      height: "44px",
+                      borderRadius: "10px",
+                      background: day.color,
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      color: "#fff",
+                      fontFamily: "'DM Sans', sans-serif",
+                      fontWeight: 600,
+                      fontSize: "16px",
+                      flexShrink: 0,
+                    }}>
+                      {dayIdx + 1}
+                    </div>
+                    <div style={{ flex: 1 }}>
+                      <h2 style={{
+                        fontSize: "20px",
+                        fontWeight: 500,
+                        color: "#2A2A2A",
+                        lineHeight: 1.2,
+                      }}>
+                        {day.date}
+                      </h2>
+                      <p style={{
+                        fontFamily: "'DM Sans', sans-serif",
+                        fontSize: "12px",
+                        color: "#999",
+                        marginTop: "2px",
+                      }}>
+                        {day.events.length} {day.events.length === 1 ? "udalosť" : day.events.length < 5 ? "udalosti" : "udalostí"}
+                      </p>
+                    </div>
+                    <div style={{
+                      fontSize: "18px",
+                      color: "#BBB",
+                      transform: isOpen ? "rotate(180deg)" : "rotate(0deg)",
+                      transition: "transform 0.3s ease",
+                    }}>
+                      ▾
+                    </div>
+                  </div>
+
+                  {/* Events */}
+                  {isOpen && (
+                    <div style={{ padding: "0 24px 20px" }}>
+                      <div style={{
+                        borderTop: `1px solid ${day.accent}`,
+                        paddingTop: "16px",
+                      }}>
+                        {day.events.map((event, eIdx) => (
+                          <div
+                            key={eIdx}
+                            className="event-row"
+                            style={{
+                              display: "flex",
+                              gap: "14px",
+                              padding: "12px 0",
+                              borderBottom: eIdx < day.events.length - 1 ? "1px solid #F5F2EE" : "none",
+                              animationDelay: `${eIdx * 0.06}s`,
+                            }}
+                          >
+                            <div style={{
+                              width: "52px",
+                              flexShrink: 0,
+                              textAlign: "right",
+                              paddingTop: "2px",
+                            }}>
+                              <span className="time-pill" style={{
+                                fontSize: "13px",
+                                fontWeight: 600,
+                                color: day.color,
+                              }}>
+                                {event.time}
+                              </span>
+                            </div>
+
+                            <div style={{
+                              display: "flex",
+                              flexDirection: "column",
+                              alignItems: "center",
+                              paddingTop: "6px",
+                              flexShrink: 0,
+                            }}>
+                              <div style={{
+                                width: "8px",
+                                height: "8px",
+                                borderRadius: "50%",
+                                background: day.color,
+                                opacity: 0.6,
+                              }} />
+                            </div>
+
+                            <div style={{ flex: 1, minWidth: 0 }}>
+                              <div style={{
+                                display: "flex",
+                                alignItems: "center",
+                                gap: "8px",
+                                flexWrap: "wrap",
+                              }}>
+                                <span style={{ fontSize: "14px" }}>
+                                  {typeConfig[event.type]?.icon}
+                                </span>
+                                <h3 style={{
+                                  fontSize: "16px",
+                                  fontWeight: 600,
+                                  color: "#2A2A2A",
+                                  lineHeight: 1.3,
+                                }}>
+                                  {event.title}
+                                </h3>
+                                <span className="type-badge" style={{
+                                  color: day.color,
+                                  background: day.accent,
+                                  padding: "2px 8px",
+                                  borderRadius: "4px",
+                                }}>
+                                  {typeConfig[event.type]?.label}
+                                </span>
+                              </div>
+
+                              <p className="location-text" style={{
+                                fontSize: "13px",
+                                color: "#888",
+                                marginTop: "4px",
+                                lineHeight: 1.4,
+                              }}>
+                                {event.location}
+                              </p>
+
+                              <div style={{
+                                display: "flex",
+                                gap: "8px",
+                                marginTop: "4px",
+                                flexWrap: "wrap",
+                              }}>
+                                {event.end && (
+                                  <span className="time-pill" style={{
+                                    fontSize: "11px",
+                                    color: "#AAA",
+                                  }}>
+                                    do {event.end}
+                                  </span>
+                                )}
+                                {event.note && (
+                                  <span className="note-tag" style={{
+                                    fontSize: "11px",
+                                    color: day.color,
+                                    background: `${day.accent}88`,
+                                    padding: "1px 7px",
+                                    borderRadius: "3px",
+                                    fontWeight: 500,
+                                  }}>
+                                    {event.note}
+                                  </span>
+                                )}
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      );
+    }
+
+    ReactDOM.createRoot(document.getElementById("root")).render(<SlovakiaTrip />);
+  </script>
+</body>
+</html>
